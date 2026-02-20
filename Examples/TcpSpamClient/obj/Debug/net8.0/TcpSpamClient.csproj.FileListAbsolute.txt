@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\bin\Debug\net8.0\TcpSpamClient.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\bin\Debug\net8.0\TcpSpamClient.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\bin\Debug\net8.0\TcpSpamClient.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\bin\Debug\net8.0\TcpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\bin\Debug\net8.0\TcpSpamClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\refint\TcpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\TcpSpamClient.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpSpamClient\obj\Debug\net8.0\ref\TcpSpamClient.dll

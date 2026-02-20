@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\bin\Debug\net8.0\UdpEchoServer.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\bin\Debug\net8.0\UdpEchoServer.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\bin\Debug\net8.0\UdpEchoServer.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\bin\Debug\net8.0\UdpEchoServer.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\bin\Debug\net8.0\UdpEchoServer.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\refint\UdpEchoServer.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\UdpEchoServer.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoServer\obj\Debug\net8.0\ref\UdpEchoServer.dll

@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\bin\Debug\net8.0\TcpEchoServerIterative.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\bin\Debug\net8.0\TcpEchoServerIterative.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\bin\Debug\net8.0\TcpEchoServerIterative.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\bin\Debug\net8.0\TcpEchoServerIterative.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\bin\Debug\net8.0\TcpEchoServerIterative.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\refint\TcpEchoServerIterative.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\TcpEchoServerIterative.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoServerIterative\obj\Debug\net8.0\ref\TcpEchoServerIterative.dll

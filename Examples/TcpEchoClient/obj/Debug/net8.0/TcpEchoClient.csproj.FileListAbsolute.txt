@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\bin\Debug\net8.0\TcpEchoClient.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\bin\Debug\net8.0\TcpEchoClient.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\bin\Debug\net8.0\TcpEchoClient.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\bin\Debug\net8.0\TcpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\bin\Debug\net8.0\TcpEchoClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\refint\TcpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\TcpEchoClient.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\TcpEchoClient\obj\Debug\net8.0\ref\TcpEchoClient.dll

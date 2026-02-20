@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\bin\Debug\net8.0\UdpSpamClient.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\bin\Debug\net8.0\UdpSpamClient.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\bin\Debug\net8.0\UdpSpamClient.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\bin\Debug\net8.0\UdpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\bin\Debug\net8.0\UdpSpamClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\refint\UdpSpamClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\UdpSpamClient.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpSpamClient\obj\Debug\net8.0\ref\UdpSpamClient.dll

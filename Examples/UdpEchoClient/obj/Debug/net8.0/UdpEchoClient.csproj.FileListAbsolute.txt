@@ -1,0 +1,15 @@
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\bin\Debug\net8.0\UdpEchoClient.exe
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\bin\Debug\net8.0\UdpEchoClient.deps.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\bin\Debug\net8.0\UdpEchoClient.runtimeconfig.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\bin\Debug\net8.0\UdpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\bin\Debug\net8.0\UdpEchoClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.AssemblyInfoInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.AssemblyInfo.cs
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.csproj.CoreCompileInputs.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.sourcelink.json
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\refint\UdpEchoClient.dll
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.pdb
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\UdpEchoClient.genruntimeconfig.cache
+C:\Users\micha.DESKTOP-Q740MKF\Documents\GitHub\Networking\Examples\UdpEchoClient\obj\Debug\net8.0\ref\UdpEchoClient.dll
