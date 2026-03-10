@@ -25,11 +25,18 @@ public class TextClient : MonoBehaviour
 
 	// This method is called from an input field event:
 	public void OnMessageEntered() {
-		// TODO: Instead of displaying the message directly, send it to the server here:
-		DisplayMessage(inputField.text);
+        // TODO: Instead of displaying the message directly, send it to the server here:
+        string str = inputField.text;
+        DisplayMessage(str);
 
-		// Clear the input field, and activate it again for the next user input:
-		inputField.text = "";
+		if (stream != null)
+		{
+            byte[] data = Encoding.ASCII.GetBytes(str);
+			stream.Write(data);
+        }
+
+        // Clear the input field, and activate it again for the next user input:
+        inputField.text = "";
 		inputField.ActivateInputField();
 		inputField.Select();
 	}
@@ -81,9 +88,12 @@ public class TextClient : MonoBehaviour
 
     void Update()
     {
-        // TODO: check the Udp or Tcp client for available incoming messages.
-        // If there are any, decode and display them.
-        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+		// TODO: check the Udp or Tcp client for available incoming messages.
+		// If there are any, decode and display them.
+		int bytesRead = 0;
+		if (client.Available > 0)
+			bytesRead = stream.Read(buffer, 0, buffer.Length);
+
 		if (bytesRead > 0) 
 		{
             string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
