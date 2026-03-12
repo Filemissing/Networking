@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using Rug.Osc;
+using System.Linq;
 
 public class TextClient : MonoBehaviour
 {
@@ -21,25 +23,106 @@ public class TextClient : MonoBehaviour
 
 	TcpClient client;
 	byte[] buffer = new byte[1024];
-	NetworkStream stream;
 
-	// This method is called from an input field event:
+	// This method is called from an input field event
 	public void OnMessageEntered() {
-        // TODO: Instead of displaying the message directly, send it to the server here:
         string str = inputField.text;
-        DisplayMessage(str);
+        DisplayMessage("Me: " + str);
 
-		if (stream != null)
-		{
-            byte[] data = Encoding.ASCII.GetBytes(str);
-			stream.Write(data);
-        }
+		List<string> parts = str.Split(' ').ToList();
 
-        // Clear the input field, and activate it again for the next user input:
+		string address = parts[0];
+		string[] args = parts.Skip(1).ToArray();
+		OscMessage msg = args.Length > 0 ? new OscMessage(address, args) : new OscMessage(address);
+
+        SendOscMessage(msg);
+
+        // Clear the input field, and activate it again for the next user input
         inputField.text = "";
 		inputField.ActivateInputField();
 		inputField.Select();
 	}
+
+	void OnServerMessage(OscMessage msg)
+	{
+		DisplayMessage("Server: " + msg.ToString());
+	}
+
+	void Start()
+    {
+		// enforce standard port range
+        if (localPort < 49125 | localPort > 65535 && localPort != 0)
+        {
+            Debug.LogError("Client port must be either 0 (for random) or in range 49125-65355");
+			return;
+        }
+
+		try
+		{
+            client = localPort > 0 ? new TcpClient(new IPEndPoint(IPAddress.Any, localPort)) : new TcpClient();
+
+			client.Connect(serverIP, serverPort);
+			Debug.Log($"Started client on {client.Client.LocalEndPoint}, connected to {client.Client.RemoteEndPoint}");
+        }
+		catch (SocketException exception)
+		{
+			DisplayMessage($"target machine refused connection, are you sure there is a sevrver running on port {serverPort}?");
+		}
+		catch (Exception exception)
+		{
+			DisplayMessage($"Error: {exception.Message}");
+			Debug.LogError(exception);
+		}
+    }
+    void Update()
+    {
+		// TODO: check the Udp or Tcp client for available incoming messages.
+		// If there are any, decode and display them.
+		int bytesRead = 0;
+		if (client.Available > 0)
+        {
+            NetworkStream stream = client.GetStream();
+
+            // message length is denoted by a 32 bit integer -> 4 bytes
+            byte[] lengthBytes = new byte[4];
+            stream.Read(lengthBytes, 0, 4);
+            int packetLength = BitConverter.ToInt32(lengthBytes, 0);
+
+            // read the actual packet content
+            byte[] bytes = new byte[packetLength];
+            stream.Read(bytes, 0, packetLength);
+
+            OscMessage message = OscMessage.Read(bytes, packetLength);
+
+            OnServerMessage(message);
+        }
+
+        if (bytesRead > 0) 
+		{
+            string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+			DisplayMessage(message);
+        }
+    }
+    private void OnDestroy()
+    {
+		Debug.Log("Disconnecting");
+        if (client != null)
+		{
+            client.Close();
+			client.Dispose();
+        }
+    }
+
+    // helper methods
+    public void SendOscMessage(OscMessage message)
+    {
+        byte[] oscData = message.ToByteArray();
+        byte[] lengthBytes = BitConverter.GetBytes(oscData.Length);
+
+        NetworkStream stream = client.GetStream();
+        stream.Write(lengthBytes, 0, 4);
+        stream.Write(oscData, 0, oscData.Length);
+    }
 
 	/// <summary>
 	/// Adds new text to the text display, while ensuring the total number of lines 
@@ -56,48 +139,4 @@ public class TextClient : MonoBehaviour
 			textField.text += line + '\n';
 		}
 	}
-
-	void Start()
-    {
-		// TODO: create a Udp or Tcp client to communicate with a server
-        if (localPort < 49125 | localPort > 65535 && localPort != 0)
-        {
-            Debug.LogError("Client port must be either 0 or in range 49125-65355");
-			return;
-        }
-
-		try
-		{
-            client = localPort > 0 ? new TcpClient(new IPEndPoint(IPAddress.Any, localPort)) : new TcpClient();
-
-			client.Connect(serverIP, serverPort);
-			Debug.Log($"Started client on {client.Client.LocalEndPoint}, connected to {client.Client.RemoteEndPoint}");
-
-			stream = client.GetStream();
-        }
-		catch (SocketException exception)
-		{
-			DisplayMessage($"target machine refused connection, are you sure there is a sevrver running on port {serverPort}?");
-		}
-		catch (Exception exception)
-		{
-			DisplayMessage($"Error: {exception.Message}");
-			Debug.LogError(exception);
-		}
-    }
-
-    void Update()
-    {
-		// TODO: check the Udp or Tcp client for available incoming messages.
-		// If there are any, decode and display them.
-		int bytesRead = 0;
-		if (client.Available > 0)
-			bytesRead = stream.Read(buffer, 0, buffer.Length);
-
-		if (bytesRead > 0) 
-		{
-            string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-			DisplayMessage(message);
-        }
-    }
 }
