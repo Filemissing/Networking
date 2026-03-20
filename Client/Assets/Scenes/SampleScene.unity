@@ -2808,8 +2808,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6188037ab9780a248ba93c7557b6775a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  serverIP: 127.0.0.1
-  serverPort: 50001
+  serverIP: ballast.proxy.rlwy.net
+  serverPort: 35440
   localPort: 0
   isInLobby: 0
 --- !u!4 &1687868145
