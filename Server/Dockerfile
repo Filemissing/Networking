@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 
 # Compile and publish the app into /app/out
-RUN dotnet publish -c Release -o out
+RUN dotnet publish ./ChessServer.csproj -c Release -o out
 
 
 # --- Stage 2: Runtime ---
@@ -25,4 +25,4 @@ COPY --from=build /app/out .
 ENV ASPNETCORE_URLS=http://0.0.0.0:$PORT
 
 # The command that runs when the container starts
-ENTRYPOINT ["dotnet", "YourProjectName.dll"]
+ENTRYPOINT ["dotnet", "ChessServer.dll"]
