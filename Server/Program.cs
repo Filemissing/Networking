@@ -1,9 +1,7 @@
-﻿using System.Net; // For IPAddress
-using System.Net.Sockets; // For TcpListener, TcpClient
-using Rug.Osc;
-using System.Linq;
-using System.Diagnostics;
-using System.ComponentModel;
+﻿using Rug.Osc;
+using System.Net; // For IPAddress
+using System.Net.Sockets;
+using System.Text; // For TcpListener, TcpClient
 
 class Server
 {
@@ -55,7 +53,21 @@ class Server
         {
             switch (addressParts[0])
             {
-                case "game":
+                case "echo":
+                    if (addressParts[1] == "game")
+                    {
+                        string? lobbyName; 
+                        playerToGame.TryGetValue(client, out lobbyName);
+                        if (lobbyName != null)
+                            games[lobbyName].Echo(message[0] as string);
+                    }
+                    else if (addressParts[1] == "global")
+                        foreach (TcpClient reciever in playerClients)
+                            SendOscMessage(reciever, message);
+
+                    break;
+
+                case "lobby":
                     HandleGameEvent(client, addressParts, message);
                     break;
 
@@ -80,7 +92,7 @@ class Server
         switch (addressParts[1])
         {
             case "list": // request a list of all active games available to join - no arguments
-                OscMessage returnMessage = new("/game/list", games.Keys.Where(key => games[key].players.Count == 1).ToArray());
+                OscMessage returnMessage = new("/lobby/list", games.Keys.Where(key => games[key].players.Count == 1).ToArray());
                 SendOscMessage(client, returnMessage);
                 break;
 
@@ -96,7 +108,10 @@ class Server
                 break;
 
             case "leave":
-                games[(string)message[0]].Leave(client);
+                string? lobbyName;
+                playerToGame.TryGetValue(client, out lobbyName);
+                if (lobbyName != null)
+                    games[lobbyName].Leave(client);
                 break;
 
             default:
@@ -109,11 +124,11 @@ class Server
         // events relating to player actions, move, resign, chat
         switch (addressParts[1])
         {
-            case "move": // player moved their piece - 1 argument move notation
+            case "move": // player moved their piece - 4 piece, color, from, to
                 string? gameName = playerToGame[client];
                 if (gameName != null)
                 {
-                    games[gameName].Move(client, (string)message[0]);
+                    games[gameName].Move(client, (string)message[0], (string)message[1], (string)message[2], (string)message[3]);
                 }
                 break;
 
@@ -200,7 +215,20 @@ class Game
     public string Name { get; private set; }
 
     public List<Player> players { get; private set; } = new List<Player>();
-    List<string> record = new();
+
+    Piece?[,] board = new Piece?[8, 8]
+    {
+        { new(PieceType.Rook, Color.White),     new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Rook, Color.Black)    },
+        { new(PieceType.Knight, Color.White),   new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Knight, Color.Black)  },
+        { new(PieceType.Bishop, Color.White),   new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Bishop, Color.Black)  },
+        { new(PieceType.Queen, Color.White),    new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Queen, Color.Black)   },
+        { new(PieceType.King, Color.White),     new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.King, Color.Black)    },
+        { new(PieceType.Bishop, Color.White),   new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Bishop, Color.Black)  },
+        { new(PieceType.Knight, Color.White),   new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Knight, Color.Black)  },
+        { new(PieceType.Rook, Color.White),     new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Rook, Color.Black)    },
+    };
+    List<string> record = new(); // not yet used but would be a nice feature
+    int turn = 0;
 
     public Game(string name)
     {
@@ -216,6 +244,9 @@ class Game
 
         Player newPlayer = new Player(client);
         players.Add(newPlayer);
+
+        foreach (var player in players)
+            Server.SendOscMessage(player.client, new OscMessage("/lobby/join", Name, players.Count));
 
         if (players.Count == 2)
             Start();
@@ -237,11 +268,11 @@ class Game
     {
         Random rng = new();
         int whitePlayer = rng.Next(players.Count);
-        players[whitePlayer].color = Color.white; // black is default so that is already set for the other player
+        players[whitePlayer].color = Color.White; // black is default so that is already set for the other player
 
         foreach (Player player in players)
         {
-            Server.SendOscMessage(player.client, new OscMessage("/game/start"));
+            Server.SendOscMessage(player.client, new OscMessage("/game/start", player.color.ToString()));
         }
     }
     public void Stop(EndState state)
@@ -255,11 +286,54 @@ class Game
         }
     }
 
-    public void Move(TcpClient client, string move)
+    public void Move(TcpClient client, string piece, string color, string oldPos, string newPos)
     {
-        record.Add(move);
+        Player? player = GetPlayerByClient(client);
+
+        if (player == null)
+            return;
+
+        bool isWhiteTurn = turn % 2 == 0;
+
+        if (isWhiteTurn ? player.color == Color.Black : player.color == Color.White)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return; // wait your turn you cheater
+        }
+
+        PieceType pieceType = (PieceType)Enum.Parse(typeof(PieceType), piece);
+        Color pieceColor = (Color)Enum.Parse(typeof(Color), color);
+
+        (int, int) oldCoords = StringToCoords(oldPos);
+        (int, int) newCoords = StringToCoords(newPos);
+
+        Piece? originPiece = board[oldCoords.Item1, oldCoords.Item2];
+        Piece? targetPiece = board[newCoords.Item1, newCoords.Item2];
+
+        bool isValidColorPiece = isWhiteTurn ? pieceColor == Color.White : pieceColor == Color.Black;
+
+        // very basic move validation
+        if (isValidColorPiece && (originPiece != null && originPiece.type == pieceType) && (targetPiece == null || targetPiece.color != pieceColor)) 
+        {
+            board[newCoords.Item1, newCoords.Item2] = originPiece;
+            board[oldCoords.Item1, oldCoords.Item2] = null;
+            Server.SendOscMessage(client, new OscMessage("/player/move/valid", BoardToString()));
+        }
+        else
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
+        turn++;
+
         Player otherPlayer = GetOtherPlayer(GetPlayerByClient(client));
-        Server.SendOscMessage(otherPlayer.client, new OscMessage("/player/move", move));
+        Server.SendOscMessage(otherPlayer.client, new OscMessage("/player/move", BoardToString()));
+    }
+    public void Echo(string message)
+    {
+        foreach (Player player in players)
+            Server.SendOscMessage(player.client, new OscMessage("/echo/game", message));
     }
 
     public enum EndState
@@ -267,7 +341,6 @@ class Game
         Disconnected,
         White,
         Black,
-        StaleMate
     }
 
     // helper methods
@@ -280,13 +353,41 @@ class Game
     {
         return players.Find(p => p.client == client);
     }
+
+    (int, int) StringToCoords(string str)
+    {
+        return (int.Parse(str[0].ToString()), int.Parse(str[1].ToString())); // todo: error handling
+    }
+
+    public string BoardToString()
+    {
+        StringBuilder sb = new StringBuilder(64);
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                Piece? piece = board[x, y];
+                if (piece == null)
+                {
+                    sb.Append('0');
+                }
+                else
+                {
+                    // +1 to avoid 0 (empty), white = 1-6, black = 7-12
+                    int value = (int)piece.type + 1 + (piece.color == Color.White ? 0 : 6);
+                    sb.Append((char)('0' + value));
+                }
+            }
+        }
+        return sb.ToString();
+    }
 }
 
 class Player
 {
     public TcpClient client { get; private set; }
 
-    public Color color = Color.black;
+    public Color color = Color.Black;
 
     public Player(TcpClient client)
     {
@@ -294,8 +395,29 @@ class Player
     }
 }
 
+class Piece
+{
+    public Piece(PieceType type, Color color)
+    {
+        this.type = type;
+        this.color = color;
+    }
+    public PieceType type { get; private set; }
+    public Color color { get; private set; }
+}
+
 enum Color
 {
-    white,
-    black
+    White,
+    Black
+}
+
+enum PieceType
+{
+    King,
+    Queen,
+    Bishop,
+    Knight,
+    Rook,
+    Pawn
 }
