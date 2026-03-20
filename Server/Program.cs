@@ -388,7 +388,7 @@ class Piece
     public PieceType type { get; private set; }
     public Color color { get; private set; }
 
-    public bool firstMove;
+    public bool firstMove = true;
 }
 
 enum Color
