@@ -20,15 +20,15 @@ class Server
         TcpListener listener = new TcpListener(IPAddress.Any, port);
         listener.Start();
         Console.WriteLine($"Starting TCP server on port {port} - listening for incoming connection requests");
-        Console.WriteLine("Press Q to stop the server");
+        //Console.WriteLine("Press Q to stop the server");
 
         while (true)
         {
-            if (QuitPressed())
-            {
-                Console.WriteLine("Stopping server");
-                break;
-            }
+            //if (QuitPressed())
+            //{
+            //    Console.WriteLine("Stopping server");
+            //    break;
+            //}
     
             AcceptNewClients(listener);
             
@@ -195,18 +195,18 @@ class Server
             }
         }
     }
-    static bool QuitPressed()
-    {
-        if (Console.KeyAvailable)
-        {
-            char input = Console.ReadKey(true).KeyChar;
-            if (input == 'q')
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    //static bool QuitPressed()
+    //{
+    //    if (Console.KeyAvailable)
+    //    {
+    //        char input = Console.ReadKey(true).KeyChar;
+    //        if (input == 'q')
+    //        {
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
 }
 
 // data structure classes
