@@ -20,16 +20,9 @@ class Server
         TcpListener listener = new TcpListener(IPAddress.Any, port);
         listener.Start();
         Console.WriteLine($"Starting TCP server on port {port} - listening for incoming connection requests");
-        //Console.WriteLine("Press Q to stop the server");
 
         while (true)
         {
-            //if (QuitPressed())
-            //{
-            //    Console.WriteLine("Stopping server");
-            //    break;
-            //}
-    
             AcceptNewClients(listener);
             
             HandleMessages();
@@ -195,18 +188,6 @@ class Server
             }
         }
     }
-    //static bool QuitPressed()
-    //{
-    //    if (Console.KeyAvailable)
-    //    {
-    //        char input = Console.ReadKey(true).KeyChar;
-    //        if (input == 'q')
-    //        {
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
 }
 
 // data structure classes
@@ -373,8 +354,10 @@ class Game
                 }
                 else
                 {
-                    // +1 to avoid 0 (empty), white = 1-6, black = 7-12
                     int value = (int)piece.type + 1 + (piece.color == Color.White ? 0 : 6);
+                    // For pawns that have already moved, add 12 as an offset
+                    if (piece.type == PieceType.Pawn && !piece.firstMove)
+                        value += 12;
                     sb.Append((char)('0' + value));
                 }
             }
@@ -404,6 +387,8 @@ class Piece
     }
     public PieceType type { get; private set; }
     public Color color { get; private set; }
+
+    public bool firstMove;
 }
 
 enum Color

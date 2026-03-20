@@ -101,8 +101,11 @@ public class BoardManager : MonoBehaviour
             int value = s[i] - '0';
             if (value == 0) continue;
 
+            bool firstMove = value <= 12; // values 13+ mean pawn that has moved
+            if (value > 12) value -= 12;
+
             Color color = value <= 6 ? Color.White : Color.Black;
-            PieceType type = (PieceType)((value <= 6 ? value : value - 6) - 1); // -1 to reverse the shift
+            PieceType type = (PieceType)((value <= 6 ? value : value - 6) - 1);
 
             Piece piece = null;
             switch (type)
@@ -127,13 +130,11 @@ public class BoardManager : MonoBehaviour
                     break;
             }
 
+            piece.firstMove = firstMove;
+
             Vector2Int cell = new Vector2Int(i / 8, i % 8);
             RectTransform rectTransform = piece.transform as RectTransform;
             SetUICoordsFromCell(cell, ref rectTransform);
-
-            piece.type = type;
-            piece.color = color;
-
             board[cell.x, cell.y] = piece;
         }
     }
@@ -161,12 +162,8 @@ public class BoardManager : MonoBehaviour
         RectTransform rectTransform = selectedPiece.transform as RectTransform;
         SetUICoordsFromCell(target, ref rectTransform);
 
-        if (selectedPiece.type == PieceType.Pawn)
-        {
-            PawnMovementStragety pawnMovementStragety = selectedPiece.strategy as PawnMovementStragety;
-            if (selectedPiece.firstMove)
-                selectedPiece.firstMove = false;
-        }
+        if (selectedPiece.firstMove == true)
+            selectedPiece.firstMove = false;
 
         NetworkManager.instance.SendOscMessage(new OscMessage("/player/move", selectedPiece.type.ToString(), selectedPiece.color.ToString(), $"{pos.x}{pos.y}", $"{target.x}{target.y}"));
     }

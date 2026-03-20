@@ -6,7 +6,7 @@ public class Piece : MonoBehaviour, IPointerClickHandler
     public Color color;
     public PieceType type;
     public MovementStrategy strategy;
-    public bool firstMove = true; // moved here from strategy
+    public bool firstMove = true;
 
     public void OnPointerClick(PointerEventData eventData)
     {
