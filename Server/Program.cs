@@ -180,12 +180,32 @@ class Server
             // If any of our current clients are disconnected, 
             // we close the TcpClient to clean up resources, and remove it from our list:
             // (Note that this type of for loop is needed since we're modifying the collection inside the loop!)
-            if (!playerClients[i].Connected)
+            TcpClient client = playerClients[i];
+
+            if (!IsConnected(ref client))
             {
+                if (playerToGame[client] != null)
+                {
+                    games[playerToGame[client]].Leave(client);
+                }
+                
                 playerClients[i].Close();
                 playerClients.RemoveAt(i);
+
                 Console.WriteLine($"Removing client. Number of connected clients: {playerClients.Count}");
             }
+        }
+    }
+    static bool IsConnected(ref TcpClient client)
+    {
+        try
+        {
+            client.Client.Send(new byte[1], 0, 0, SocketFlags.None);
+            return true;
+        }
+        catch (SocketException)
+        {
+            return false;
         }
     }
 }
