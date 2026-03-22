@@ -85,7 +85,7 @@ class Server
         switch (addressParts[1])
         {
             case "list": // request a list of all active games available to join - no arguments
-                OscMessage returnMessage = new("/lobby/list", games.Keys.Where(key => games[key].players.Count == 1).ToArray());
+                OscMessage returnMessage = new("/lobby/list", games.Keys.Where(key => games[key].players.Count == 1 && !games[key].isFinished).ToArray());
                 SendOscMessage(client, returnMessage);
                 break;
 
@@ -214,6 +214,7 @@ class Server
 public class Game
 {
     public string Name { get; private set; }
+    public bool isFinished = false;
 
     public List<Player> players { get; private set; } = new List<Player>();
 
@@ -285,6 +286,8 @@ public class Game
                 Server.SendOscMessage(player.client, new OscMessage("/game/stop", state.ToString())); // notify any remaining connections that this room is no longer available
             }
         }
+
+        isFinished = true;
     }
 
     public void Move(TcpClient client, string piece, string color, string oldPos, string newPos)

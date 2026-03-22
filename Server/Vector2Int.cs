@@ -15,4 +15,22 @@ public class Vector2Int
 
     public static Vector2Int operator +(Vector2Int left, Vector2Int right) =>
         new Vector2Int(left.x + right.x, left.y + right.y);
+
+    public static bool operator ==(Vector2Int left, Vector2Int right) =>
+        left.x == right.x && left.y == right.y;
+
+    public static bool operator !=(Vector2Int left, Vector2Int right) =>
+        !(left == right);
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Vector2Int other)
+            return x == other.x && y == other.y;
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(x, y);
+    }
 }
