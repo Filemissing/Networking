@@ -91,6 +91,11 @@ class Server
 
             case "create": // create a new game - 1 argument name
                 string name = (string)message[0];
+                games.TryGetValue(name, out Game? existingGame);
+
+                if (existingGame != null)
+                    existingGame.Join(client);
+
                 Game game = new Game(name);
                 game.Join(client);
                 games[name] = game;
