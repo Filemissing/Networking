@@ -1,6 +1,7 @@
 using Rug.Osc;
 using System;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(CanvasGroup))]
@@ -27,12 +28,14 @@ public class BoardManager : MonoBehaviour
                 break;
 
             case "stop":
-                EndGame();
+                EndGame((EndState)Enum.Parse(typeof(EndState), msg[0] as string, true));
                 break;
         }
     }
     public void StartGame(Color playerColor)
     {
+        DisableGameEndCover();
+
         canvasGroup.alpha = 1;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
@@ -40,13 +43,14 @@ public class BoardManager : MonoBehaviour
         this.playerColor = playerColor;
         InitializeBoard();
     }
-    public void EndGame()
+    public void EndGame(EndState endState)
     {
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
 
-        ClearBoard();
+        EnableGameEndCover(endState);
+
     }
 
     Piece[,] board = new Piece[8, 8];
@@ -82,7 +86,7 @@ public class BoardManager : MonoBehaviour
             }
         }
     }
-    void ClearBoard()
+    public void ClearBoard()
     {
         // destroy any possible remaining pieces
         if (piecesParent.childCount > 0)
@@ -145,7 +149,8 @@ public class BoardManager : MonoBehaviour
 
 
     public Color playerColor;
-    
+
+    [Header("Pieces")]
     public Pieces whitePieces;
     public Pieces blackPieces;
     public Piece selectedPiece;
@@ -207,7 +212,7 @@ public class BoardManager : MonoBehaviour
         return cell.x >= 0 && cell.x < 8 && cell.y >= 0 && cell.y < 8;
     }
 
-
+    [Header("Indicators")]
     [SerializeField] Transform indicatorParent;
     [SerializeField] GameObject movementIndicator;
     [SerializeField] GameObject captureIndicator;
@@ -238,17 +243,40 @@ public class BoardManager : MonoBehaviour
 
     // currently unused
     [SerializeField] CanvasGroup waitTurnGroup;
-    void EnableCover()
+    void EnableWaitTurnCover()
     {
         waitTurnGroup.alpha = 1;
         waitTurnGroup.interactable = true;
         waitTurnGroup.blocksRaycasts = true;
     }
-    void DisableCover()
+    void DisableWaitTurnCover()
     {
         waitTurnGroup.alpha = 0;
         waitTurnGroup.interactable = false;
         waitTurnGroup.blocksRaycasts = false;
+    }
+
+
+    [SerializeField] CanvasGroup gameEndGroup;
+    [SerializeField] TMP_Text gameEndText;
+    void EnableGameEndCover(EndState endState)
+    {
+        gameEndGroup.alpha = 1;
+        gameEndGroup.interactable = true;
+        gameEndGroup.blocksRaycasts = true;
+
+        gameEndText.text = endState switch { 
+            EndState.Disconnected => "Opponent disconnected", 
+            EndState.Black => "Black wins", 
+            EndState.White => "White wins", 
+            _ => "Unknown end state" 
+        };
+    }
+    public void DisableGameEndCover()
+    {
+        gameEndGroup.alpha = 0;
+        gameEndGroup.interactable = false;
+        gameEndGroup.blocksRaycasts = false;
     }
 }
 
@@ -261,4 +289,11 @@ public class Pieces
     public Piece knight;
     public Piece rook;
     public Piece pawn;
+}
+
+public enum EndState
+{
+    Disconnected,
+    White,
+    Black,
 }

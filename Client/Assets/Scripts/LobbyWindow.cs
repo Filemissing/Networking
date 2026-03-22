@@ -71,6 +71,9 @@ public class LobbyWindow : MonoBehaviour
         listGroup.alpha = 1;
         listGroup.interactable = true;
         listGroup.blocksRaycasts = true;
+
+        BoardManager.instance.DisableGameEndCover();
+        BoardManager.instance.ClearBoard();
     }
 
     const int waitTime = 1;

@@ -191,7 +191,7 @@ class Server
 }
 
 // data structure classes
-class Game
+public class Game
 {
     public string Name { get; private set; }
 
@@ -241,7 +241,7 @@ class Game
             Server.playerToGame[client] = null;
         }
 
-        if (players.Count == 0)
+        if (players.Count <= 1)
             Stop(EndState.Disconnected);
     }
 
@@ -274,31 +274,57 @@ class Game
         if (player == null)
             return;
 
-        bool isWhiteTurn = turn % 2 == 0;
+        Color turnColor = turn % 2 == 0 ? Color.White : Color.Black;
 
-        if (isWhiteTurn ? player.color == Color.Black : player.color == Color.White)
+        if (turnColor != player.color)
         {
             Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
             return; // wait your turn you cheater
         }
 
-        PieceType pieceType = (PieceType)Enum.Parse(typeof(PieceType), piece);
-        Color pieceColor = (Color)Enum.Parse(typeof(Color), color);
+        PieceType? pieceType;
+        Color? pieceColor;
 
-        (int, int) oldCoords = StringToCoords(oldPos);
-        (int, int) newCoords = StringToCoords(newPos);
+        Vector2Int? oldCoords;
+        Vector2Int? newCoords;
 
-        Piece? originPiece = board[oldCoords.Item1, oldCoords.Item2];
-        Piece? targetPiece = board[newCoords.Item1, newCoords.Item2];
+        try
+        {
+            pieceType = (PieceType)Enum.Parse(typeof(PieceType), piece);
+            pieceColor = (Color)Enum.Parse(typeof(Color), color);
 
-        bool isValidColorPiece = isWhiteTurn ? pieceColor == Color.White : pieceColor == Color.Black;
+            oldCoords = StringToCoords(oldPos);
+            newCoords = StringToCoords(newPos);
+        }
+        catch (Exception)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
+        Piece? originPiece = board[oldCoords.x, oldCoords.y];
+        Piece? targetPiece = board[newCoords.x, newCoords.y];
+        if (originPiece == null)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return; // likely desync
+        }
+
+        bool isValidColorPiece = turnColor == pieceColor;
+        bool isCorrectPiece = originPiece.type == pieceType;
+
+        MovementStrategy strategy = GetPieceStrategy(originPiece.type);
+        bool isValidMove = (targetPiece == null ? strategy.CanMove(oldCoords, originPiece, this) : strategy.CanTake(oldCoords, originPiece, this, player.color)).Contains(newCoords);
 
         // very basic move validation
-        if (isValidColorPiece && (originPiece != null && originPiece.type == pieceType) && (targetPiece == null || targetPiece.color != pieceColor)) 
+        if (isValidColorPiece && isCorrectPiece && isValidMove)
         {
-            board[newCoords.Item1, newCoords.Item2] = originPiece;
-            board[oldCoords.Item1, oldCoords.Item2] = null;
+            board[newCoords.x, newCoords.y] = originPiece;
+            board[oldCoords.x, oldCoords.y] = null;
             Server.SendOscMessage(client, new OscMessage("/player/move/valid", BoardToString()));
+
+            if (targetPiece != null && targetPiece.type == PieceType.King)
+                Stop(targetPiece.color == Color.White ? EndState.Black: EndState.White);
         }
         else
         {
@@ -335,9 +361,13 @@ class Game
         return players.Find(p => p.client == client);
     }
 
-    (int, int) StringToCoords(string str)
+    Vector2Int StringToCoords(string str)
     {
-        return (int.Parse(str[0].ToString()), int.Parse(str[1].ToString())); // todo: error handling
+        Vector2Int vec = new(int.Parse(str[0].ToString()), int.Parse(str[1].ToString()));
+        if (!IsValidCell(vec))
+            throw new Exception("Coords outside of board");
+
+        return vec;
     }
 
     public string BoardToString()
@@ -364,9 +394,31 @@ class Game
         }
         return sb.ToString();
     }
+
+    public bool IsValidCell(Vector2Int cell)
+    {
+        return cell.x >= 0 && cell.y >= 0 && cell.x < 8 && cell.y < 8;
+    }
+    public Piece? ContainsPiece(Vector2Int cell)
+    {
+        return board[cell.x, cell.y];
+    }
+    List<MovementStrategy> movementStrategies = new()
+    {
+        new KingMovementStragety(),
+        new QueenMovementStragety(),
+        new BishopMovementStragety(),
+        new KnightMovementStragety(),
+        new RookMovementStragety(),
+        new PawnMovementStragety()
+    };
+    public MovementStrategy GetPieceStrategy(PieceType pieceType)
+    {
+        return movementStrategies[(int)pieceType];
+    }
 }
 
-class Player
+public class Player
 {
     public TcpClient client { get; private set; }
 
@@ -377,8 +429,7 @@ class Player
         this.client = client;
     }
 }
-
-class Piece
+public class Piece
 {
     public Piece(PieceType type, Color color)
     {
@@ -390,14 +441,12 @@ class Piece
 
     public bool firstMove = true;
 }
-
-enum Color
+public enum Color
 {
     White,
     Black
 }
-
-enum PieceType
+public enum PieceType
 {
     King,
     Queen,
