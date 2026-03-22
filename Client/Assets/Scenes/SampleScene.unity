@@ -1878,6 +1878,8 @@ MonoBehaviour:
   movementIndicator: {fileID: 2179063638223930238, guid: d8ac9ff9e5f6f19419d4f667a78ed1bf, type: 3}
   captureIndicator: {fileID: 3379164942537118221, guid: f6cce7fb5ff432647891b790825b57e9, type: 3}
   waitTurnGroup: {fileID: 772863905}
+  gameEndGroup: {fileID: 810554655}
+  gameEndText: {fileID: 1172911785}
 --- !u!1 &1024659454
 GameObject:
   m_ObjectHideFlags: 0
@@ -2996,6 +2998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6188037ab9780a248ba93c7557b6775a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  localServer: 0
   serverIP: ballast.proxy.rlwy.net
   serverPort: 35440
   localPort: 0

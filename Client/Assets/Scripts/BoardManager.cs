@@ -4,7 +4,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 
-[RequireComponent(typeof(CanvasGroup))]
 public class BoardManager : MonoBehaviour
 {
     public static BoardManager instance;
@@ -14,11 +13,8 @@ public class BoardManager : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
-
-        canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    CanvasGroup canvasGroup;
     public void HandleGameEvent(OscMessage msg, string subAddress)
     {
         switch (subAddress)
@@ -36,21 +32,12 @@ public class BoardManager : MonoBehaviour
     {
         DisableGameEndCover();
 
-        canvasGroup.alpha = 1;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
-
         this.playerColor = playerColor;
         InitializeBoard();
     }
     public void EndGame(EndState endState)
     {
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-
         EnableGameEndCover(endState);
-
     }
 
     Piece[,] board = new Piece[8, 8];

@@ -18,8 +18,9 @@ public class NetworkManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    [SerializeField] string serverIP = "127.0.0.1";
-    [SerializeField] int serverPort = 50001;
+    [SerializeField] bool localServer;
+    [SerializeField] string serverIP;
+    [SerializeField] int serverPort;
     [SerializeField] int localPort = 0;
 
     [HideInInspector] public bool isInLobby = false;
@@ -51,6 +52,12 @@ public class NetworkManager : MonoBehaviour
 
     void Start()
     {
+        if (localServer)
+        {
+            serverIP = "127.0.0.1";
+            serverPort = 50001;
+        }
+
         // enforce standard port range
         if (localPort < 49125 | localPort > 65535 && localPort != 0)
         {
