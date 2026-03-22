@@ -205,7 +205,15 @@ class Server
     {
         try
         {
-            client.Client.Send(new byte[1], 0, 0, SocketFlags.None);
+            Socket socket = client.Client;
+            // Poll returns true if there is data available, connection closed, or error
+            bool pollResult = socket.Poll(1000, SelectMode.SelectRead);
+            bool noData = socket.Available == 0;
+
+            // If poll returned true but there's no data, the connection is dead
+            if (pollResult && noData)
+                return false;
+
             return true;
         }
         catch (SocketException)
