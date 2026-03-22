@@ -94,7 +94,7 @@ class Server
                 games.TryGetValue(name, out Game? existingGame);
 
                 if (existingGame != null)
-                    existingGame.Join(client);
+                    return;
 
                 Game game = new Game(name);
                 game.Join(client);
@@ -358,6 +358,8 @@ public class Game
             board[newCoords.x, newCoords.y] = originPiece;
             board[oldCoords.x, oldCoords.y] = null;
             Server.SendOscMessage(client, new OscMessage("/player/move/valid", BoardToString()));
+
+            originPiece.firstMove = false;
 
             if (targetPiece != null && targetPiece.type == PieceType.King)
                 Stop(targetPiece.color == Color.White ? EndState.Black: EndState.White);
