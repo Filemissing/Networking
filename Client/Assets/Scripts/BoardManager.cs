@@ -1,6 +1,5 @@
 using Rug.Osc;
 using System;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -48,7 +47,6 @@ public class BoardManager : MonoBehaviour
         // (file, rank) => piece prefab, indexed [x][y] matching your board layout
         Piece[,] prefabs = new Piece[8, 8]
         {
-        // x=0 (a-file)
         { whitePieces.rook,   whitePieces.pawn, null, null, null, null, blackPieces.pawn, blackPieces.rook   },
         { whitePieces.knight, whitePieces.pawn, null, null, null, null, blackPieces.pawn, blackPieces.knight },
         { whitePieces.bishop, whitePieces.pawn, null, null, null, null, blackPieces.pawn, blackPieces.bishop },
@@ -157,6 +155,15 @@ public class BoardManager : MonoBehaviour
         if (selectedPiece.firstMove == true)
             selectedPiece.firstMove = false;
 
+        if (selectedPiece.type == PieceType.Pawn)
+        {
+            if (selectedPiece.color == Color.White ? target.y == 7 : target.y == 0)
+            {
+                cellForPromotion = target;
+                EnablePromotionSelector(target);
+            }
+        }
+
         NetworkManager.instance.SendOscMessage(new OscMessage("/player/move", selectedPiece.type.ToString(), selectedPiece.color.ToString(), $"{pos.x}{pos.y}", $"{target.x}{target.y}"));
     }
 
@@ -264,6 +271,29 @@ public class BoardManager : MonoBehaviour
         gameEndGroup.alpha = 0;
         gameEndGroup.interactable = false;
         gameEndGroup.blocksRaycasts = false;
+    }
+
+    [SerializeField] CanvasGroup promotionSelector;
+    Vector2Int cellForPromotion;
+    public void EnablePromotionSelector(Vector2Int position)
+    {
+        Vector2Int direction = playerColor == Color.White ? Vector2Int.down : Vector2Int.up; // offset direction to make sure it's visible
+        RectTransform rectTransform = promotionSelector.transform as RectTransform;
+        SetUICoordsFromCell(position + direction, ref rectTransform);
+
+        promotionSelector.alpha = 1;
+        promotionSelector.interactable = true;
+        promotionSelector.blocksRaycasts = true;
+    }
+    public void Promote(int intPiece)
+    {
+        PieceType piece = (PieceType)intPiece;
+        
+        NetworkManager.instance.SendOscMessage(new OscMessage("/player/promote", $"{cellForPromotion.x}{cellForPromotion.y}", piece.ToString()));
+        
+        promotionSelector.alpha = 0;
+        promotionSelector.interactable = false;
+        promotionSelector.blocksRaycasts = false;
     }
 }
 

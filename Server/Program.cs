@@ -12,7 +12,7 @@ class Server
 
     static List<TcpClient> playerClients = new();
     public static Dictionary<TcpClient, string?> playerToGame = new();
-    static Dictionary<string, Game> games = new();
+    public static Dictionary<string, Game> games = new();
 
     static void StartServer(int port)
     {
@@ -26,7 +26,7 @@ class Server
             AcceptNewClients(listener);
             
             HandleMessages();
-            
+
             CleanupClients();
 
             Thread.Sleep(10);
@@ -61,7 +61,7 @@ class Server
                     break;
 
                 case "lobby":
-                    HandleGameEvent(client, addressParts, message);
+                    HandleLobbyEvent(client, addressParts, message);
                     break;
 
                 case "player":
@@ -78,8 +78,7 @@ class Server
             Console.Write(e.ToString());
         }
     }
-
-    static void HandleGameEvent(TcpClient client, string[] addressParts, OscMessage message)
+    static void HandleLobbyEvent(TcpClient client, string[] addressParts, OscMessage message)
     {
         // events relating to game creation and ending, rematches, etc.
         switch (addressParts[1])
@@ -97,7 +96,7 @@ class Server
                     return;
 
                 Game game = new Game(name);
-                game.Join(client);
+                game.Join(client, true);
                 games[name] = game;
                 break;
 
@@ -106,10 +105,13 @@ class Server
                 break;
 
             case "leave":
-                string? lobbyName;
-                playerToGame.TryGetValue(client, out lobbyName);
-                if (lobbyName != null)
+                if (playerToGame.TryGetValue(client, out string? lobbyName) && lobbyName != null)
                     games[lobbyName].Leave(client);
+                break;
+
+            case "start":
+                if (playerToGame.TryGetValue(client, out string? lobbyName2) && lobbyName2 != null)
+                    games[lobbyName2].Start();
                 break;
 
             default:
@@ -122,11 +124,19 @@ class Server
         // events relating to player actions, move, resign, chat
         switch (addressParts[1])
         {
-            case "move": // player moved their piece - 4 piece, color, from, to
+            case "move": // player moved their piece - 4 arguments piece, color, from, to
                 string? gameName = playerToGame[client];
                 if (gameName != null)
                 {
                     games[gameName].Move(client, (string)message[0], (string)message[1], (string)message[2], (string)message[3]);
+                }
+                break;
+
+            case "promote": // player promotes a pawn - 2 arguments cell, piece
+                string? gameName2 = playerToGame[client];
+                if (gameName2 != null)
+                {
+                    games[gameName2].Promote(client, (string)message[0], (string)message[1]);
                 }
                 break;
 
@@ -189,9 +199,9 @@ class Server
 
             if (!IsConnected(ref client))
             {
-                if (playerToGame[client] != null)
+                if (playerToGame.TryGetValue(client, out string? gameName) && gameName != null)
                 {
-                    games[playerToGame[client]].Leave(client);
+                    games[gameName].Leave(client);
                 }
                 
                 playerClients[i].Close();
@@ -227,6 +237,8 @@ class Server
 public class Game
 {
     public string Name { get; private set; }
+
+    public bool hasStarted = false;
     public bool isFinished = false;
 
     public List<Player> players { get; private set; } = new List<Player>();
@@ -242,17 +254,18 @@ public class Game
         { new(PieceType.Knight, Color.White),   new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Knight, Color.Black)  },
         { new(PieceType.Rook, Color.White),     new(PieceType.Pawn, Color.White), null, null, null, null, new(PieceType.Pawn, Color.Black), new(PieceType.Rook, Color.Black)    },
     };
-    List<string> record = new(); // not yet used but would be a nice feature
     int turn = 0;
+
+    bool expectPromotion = false;
 
     public Game(string name)
     {
         this.Name = name;
     }
 
-    public void Join(TcpClient client)
+    public void Join(TcpClient client, bool isHost = false)
     {
-        if (players.Count == 2)
+        if (players.Count >= 2 || hasStarted || isFinished)
             return;
 
         Server.playerToGame[client] = Name;
@@ -263,7 +276,7 @@ public class Game
         foreach (var player in players)
             Server.SendOscMessage(player.client, new OscMessage("/lobby/join", Name, players.Count));
 
-        if (players.Count == 2)
+        if (players.Count >= 2)
             Start();
     }
     public void Leave(TcpClient client)
@@ -277,10 +290,16 @@ public class Game
 
         if (players.Count <= 1)
             Stop(EndState.Disconnected);
+
+        if (players.Count == 0)
+            Server.games.Remove(Name);
     }
 
     public void Start()
     {
+        if (hasStarted || isFinished)
+            return;
+
         Random rng = new();
         int whitePlayer = rng.Next(players.Count);
         players[whitePlayer].color = Color.White; // black is default so that is already set for the other player
@@ -289,6 +308,8 @@ public class Game
         {
             Server.SendOscMessage(player.client, new OscMessage("/game/start", player.color.ToString()));
         }
+
+        hasStarted = true;
     }
     public void Stop(EndState state)
     {
@@ -310,6 +331,17 @@ public class Game
         if (player == null)
             return;
 
+        if (!hasStarted || isFinished)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+        if (expectPromotion)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
         Color turnColor = turn % 2 == 0 ? Color.White : Color.Black;
 
         if (turnColor != player.color)
@@ -318,6 +350,7 @@ public class Game
             return; // wait your turn you cheater
         }
 
+        // try parsing inputs
         PieceType? pieceType;
         Color? pieceColor;
 
@@ -346,13 +379,13 @@ public class Game
             return; // likely desync
         }
 
+        // move validation
         bool isValidColorPiece = turnColor == pieceColor;
         bool isCorrectPiece = originPiece.type == pieceType;
 
         MovementStrategy strategy = GetPieceStrategy(originPiece.type);
         bool isValidMove = (targetPiece == null ? strategy.CanMove(oldCoords, originPiece, this) : strategy.CanTake(oldCoords, originPiece, this, player.color)).Contains(newCoords);
 
-        // very basic move validation
         if (isValidColorPiece && isCorrectPiece && isValidMove)
         {
             board[newCoords.x, newCoords.y] = originPiece;
@@ -363,6 +396,11 @@ public class Game
 
             if (targetPiece != null && targetPiece.type == PieceType.King)
                 Stop(targetPiece.color == Color.White ? EndState.Black: EndState.White);
+            bool isPromotionRow = originPiece.color == Color.White ? newCoords.y == 7 : newCoords.y == 0;
+            if (originPiece.type == PieceType.Pawn && isPromotionRow)
+                expectPromotion = true;
+            else
+                turn++;
         }
         else
         {
@@ -370,9 +408,77 @@ public class Game
             return;
         }
 
-        turn++;
 
-        Player otherPlayer = GetOtherPlayer(GetPlayerByClient(client));
+        // notify other player
+        Player otherPlayer = GetOtherPlayer(player);
+        Server.SendOscMessage(otherPlayer.client, new OscMessage("/player/move", BoardToString()));
+    }
+    public void Promote(TcpClient client, string position, string piece)
+    {
+        if (!expectPromotion)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
+        Player? player = GetPlayerByClient(client);
+        if (player == null)
+            return;
+
+        if (!hasStarted || isFinished)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
+        Color turnColor = turn % 2 == 0 ? Color.White : Color.Black;
+
+        if (turnColor != player.color)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return; // wait your turn you cheater
+        }
+
+        Vector2Int? pos = null;
+        PieceType? promotionPiece = null;
+        Piece? originalPiece = null;
+
+        try
+        {
+            pos = StringToCoords(position);
+            promotionPiece = (PieceType)Enum.Parse(typeof(PieceType), piece);
+            originalPiece = board[pos.x, pos.y];
+        }
+        catch (Exception)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+
+        if (piece == null || promotionPiece == null)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        }
+        if (pos.y != 0 && pos.y != 7)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        } // not a promotion square
+        if (originalPiece.type != PieceType.Pawn || promotionPiece == PieceType.Pawn || promotionPiece == PieceType.King)
+        {
+            Server.SendOscMessage(client, new OscMessage("/player/move/invalid", BoardToString()));
+            return;
+        } // invalid piece
+
+        originalPiece.type = (PieceType)promotionPiece;
+        Server.SendOscMessage(client, new OscMessage("/player/move/valid", BoardToString()));
+
+        turn++;
+        expectPromotion = false;
+
+        // notify other player
+        Player otherPlayer = GetOtherPlayer(player);
         Server.SendOscMessage(otherPlayer.client, new OscMessage("/player/move", BoardToString()));
     }
     public void Echo(string message)
@@ -386,6 +492,8 @@ public class Game
         Disconnected,
         White,
         Black,
+        WhiteTime,
+        BlackTime
     }
 
     // helper methods
@@ -462,9 +570,12 @@ public class Player
 
     public Color color = Color.Black;
 
-    public Player(TcpClient client)
+    public bool isHost {  get; private set; }
+
+    public Player(TcpClient client, bool isHost = false)
     {
         this.client = client;
+        this.isHost = isHost;
     }
 }
 public class Piece
@@ -474,7 +585,7 @@ public class Piece
         this.type = type;
         this.color = color;
     }
-    public PieceType type { get; private set; }
+    public PieceType type { get; set; }
     public Color color { get; private set; }
 
     public bool firstMove = true;

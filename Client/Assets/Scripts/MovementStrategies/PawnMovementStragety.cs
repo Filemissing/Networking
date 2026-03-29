@@ -12,7 +12,7 @@ public class PawnMovementStragety : MovementStrategy
         Vector2Int oneStep = position + forward;
 
         // Can't move forward if blocked
-        if (BoardManager.instance.ContainsPiece(oneStep) != null)
+        if (BoardManager.instance.IsValidCell(oneStep) && BoardManager.instance.ContainsPiece(oneStep) != null)
             return result;
 
         result.Add(oneStep);
@@ -21,7 +21,7 @@ public class PawnMovementStragety : MovementStrategy
         if (piece.firstMove)
         {
             Vector2Int twoStep = oneStep + forward;
-            if (BoardManager.instance.ContainsPiece(twoStep) == null)
+            if (BoardManager.instance.IsValidCell(twoStep) && BoardManager.instance.ContainsPiece(twoStep) == null)
                 result.Add(twoStep);
         }
 
