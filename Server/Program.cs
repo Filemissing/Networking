@@ -1,4 +1,5 @@
 ﻿using Rug.Osc;
+using System.Diagnostics;
 using System.Net; // For IPAddress
 using System.Net.Sockets;
 using System.Text; // For TcpListener, TcpClient
@@ -151,9 +152,24 @@ class Server
         byte[] oscData = message.ToByteArray();
         byte[] lengthBytes = BitConverter.GetBytes(oscData.Length);
 
-        NetworkStream stream = client.GetStream();
-        stream.Write(lengthBytes, 0, 4);
-        stream.Write(oscData, 0, oscData.Length);
+        try
+        {
+            NetworkStream stream = client.GetStream();
+            stream.Write(lengthBytes, 0, 4);
+            stream.Write(oscData, 0, oscData.Length);
+        }
+        catch (Exception)
+        {
+            if (!IsConnected(ref client))
+            {
+                DisconnectClient(ref client);
+                Console.WriteLine($"Failed to send message to client at {client.Client.RemoteEndPoint}, connection appears to be closed. Removing client.");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to send message to client at {client.Client.RemoteEndPoint} due to an unexpected error.");
+            }
+        }
     }
 
     static void AcceptNewClients(TcpListener listener)
@@ -165,6 +181,7 @@ class Server
             Console.WriteLine($"Client connected from remote end point {newClient.Client.RemoteEndPoint}");
         }
     }
+    static Dictionary<TcpClient, int> stateMap = new();
     static void HandleMessages()
     {
         foreach (TcpClient client in playerClients)
@@ -173,15 +190,36 @@ class Server
             {
                 NetworkStream stream = client.GetStream();
 
-                // message length is denoted by a 32 bit integer -> 4 bytes
-                byte[] lengthBytes = new byte[4];
-                stream.Read(lengthBytes, 0, 4);
-                int packetLength = BitConverter.ToInt32(lengthBytes, 0);
+                if (!stateMap.TryGetValue(client, out int packetLength))
+                {
+                    if (client.Available < 4)
+                    {
+                        Console.WriteLine("Recieved incomplete message header");
+                        stream.Read(new byte[client.Available], 0, client.Available); // clear the incomplete header from the stream
+                        break;
+                    }
+                    // message length is denoted by a 32 bit integer -> 4 bytes
+                    byte[] lengthBytes = new byte[4];
+                    stream.Read(lengthBytes, 0, 4);
+                    packetLength = BitConverter.ToInt32(lengthBytes, 0);
+
+                    if (client.Available < packetLength)
+                    {
+                        Console.WriteLine("Recieved header for incomplete message, waiting for extra data");
+                        stateMap[client] = packetLength; // store the expected length of 
+                    }
+                }
 
                 // read the actual packet content
                 byte[] bytes = new byte[packetLength];
-                stream.Read(bytes, 0, packetLength);
+                int bytesRead = stream.Read(bytes, 0, packetLength);
 
+                if (bytesRead < packetLength)
+                {
+                    Console.WriteLine($"Something went wrongm while reading message from client at {client.Client.RemoteEndPoint}");
+                    break;
+                }
+                    
                 OscMessage message = OscMessage.Read(bytes, packetLength);
 
                 OnClientMessage(client, message);
@@ -199,17 +237,21 @@ class Server
 
             if (!IsConnected(ref client))
             {
-                if (playerToGame.TryGetValue(client, out string? gameName) && gameName != null)
-                {
-                    games[gameName].Leave(client);
-                }
-                
-                playerClients[i].Close();
-                playerClients.RemoveAt(i);
-
-                Console.WriteLine($"Removing client. Number of connected clients: {playerClients.Count}");
+                DisconnectClient(ref client);
             }
         }
+    }
+    static void DisconnectClient(ref TcpClient client)
+    {
+        if (playerToGame.TryGetValue(client, out string? gameName) && gameName != null)
+        {
+            games[gameName].Leave(client);
+        }
+
+        playerClients.Remove(client);
+        client.Close();
+
+        Console.WriteLine($"Removing client. Number of connected clients: {playerClients.Count}");
     }
     static bool IsConnected(ref TcpClient client)
     {
