@@ -190,7 +190,7 @@ class Server
             {
                 NetworkStream stream = client.GetStream();
 
-                if (!stateMap.TryGetValue(client, out int packetLength))
+                if (!stateMap.TryGetValue(client, out int packetLength)) // check if we are currently expecting more data for an incomplete message
                 {
                     if (client.Available < 4)
                     {
@@ -198,16 +198,17 @@ class Server
                         stream.Read(new byte[client.Available], 0, client.Available); // clear the incomplete header from the stream
                         break;
                     }
+
                     // message length is denoted by a 32 bit integer -> 4 bytes
                     byte[] lengthBytes = new byte[4];
                     stream.Read(lengthBytes, 0, 4);
                     packetLength = BitConverter.ToInt32(lengthBytes, 0);
+                }
 
-                    if (client.Available < packetLength)
-                    {
-                        Console.WriteLine("Recieved header for incomplete message, waiting for extra data");
-                        stateMap[client] = packetLength; // store the expected length of 
-                    }
+                if (client.Available < packetLength)
+                {
+                    Console.WriteLine("Recieved header for incomplete message, waiting for extra data");
+                    stateMap[client] = packetLength; // store the expected length of the arriving message so that we can wait for the rest of the data to arrive in the next loop iteration
                 }
 
                 // read the actual packet content
@@ -219,10 +220,21 @@ class Server
                     Console.WriteLine($"Something went wrongm while reading message from client at {client.Client.RemoteEndPoint}");
                     break;
                 }
-                    
-                OscMessage message = OscMessage.Read(bytes, packetLength);
 
-                OnClientMessage(client, message);
+                OscMessage? message = null;
+
+                try
+                {
+                    message = OscMessage.Read(bytes, packetLength);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"Failed to parse message from client at {client.Client.RemoteEndPoint}, invalid OSC format");
+                    break;
+                }
+
+                if (message != null)
+                    OnClientMessage(client, message);
             }
         }
     }
