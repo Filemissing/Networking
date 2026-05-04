@@ -33,6 +33,7 @@ class Server
             Thread.Sleep(10);
         }
 
+        // not accessible since the online hosting does not support exit conditions
         // When stopping the server, properly clean up all resources
         foreach (TcpClient client in playerClients)
             client.Close();
@@ -110,10 +111,10 @@ class Server
                     games[lobbyName].Leave(client);
                 break;
 
-            case "start":
-                if (playerToGame.TryGetValue(client, out string? lobbyName2) && lobbyName2 != null)
-                    games[lobbyName2].Start();
-                break;
+            //case "start":
+            //    if (playerToGame.TryGetValue(client, out string? lobbyName2) && lobbyName2 != null)
+            //        games[lobbyName2].Start();
+            //    break;
 
             default:
                 Console.WriteLine($"Recieved unknown Game-event {message.Address} from client at {client.Client.RemoteEndPoint}");
